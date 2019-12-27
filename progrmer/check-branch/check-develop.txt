@@ -1,0 +1,23 @@
+############# script to check the branch for win/linux #############################
+
+"""""""""""""""""""""""""""""for windows """""""""""""""""""""""""""""""""""""""""""
+
+
+@echo off 
+
+git branch | find "* develop" > NUL & IF ERRORLEVEL 1 (
+ECHO I am NOT on develop
+) ELSE (
+ECHO I am on develop
+) 
+
+
+
+
+""""""""""""""""""""""""""" for linux """"""""""""""""""""""""""""""""""""""""""""""""""""
+
+branch_name=$(git symbolic-ref -q HEAD)
+branch_name=${branch_name##refs/heads/}
+branch_name=${branch_name:-HEAD} :: for detached head situation 
+
+

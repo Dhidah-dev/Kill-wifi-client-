@@ -1,0 +1,49 @@
+path
+Set PATH=%PATH%;C:\Program Files\PuTTY\
+path
+echo y | pscp -scp -pw aymen1982  aymenabd@tuncxd0046:/local/dhidahr/STM32CubeProgrammer/app/STM32_Programmer_CLI C:\git\repo\gui\linux-x86-64
+echo y | pscp -scp -pw aymen1982  aymenabd@tuncxd0046:/local/dhidahr/STM32CubeProgrammer/app/libSTLinkUSBDriver.so C:\git\repo\gui\linux-x86-64
+
+
+scp -r aymenabd@tuncxd0046:/local/dhidahr/STM32CubeProgrammer/app/STM32_Programmer_CLI  /c/git/repo/gui/linux-x86-64/CubeProgrammer
+xcopy  CubeProgrammer_API\release\CubeProgrammer_API1.dll ..\gui\win32-x86-32\CubeProgrammer /Y
+xcopy  app\release\STM32_Programmer_CLI.exe ..\gui\win32-x86-32\CubeProgrammer /Y
+########################################import resourcees from linux 64 bit ###################################################################
+:: file manager for linux 64 
+echo y | pscp -scp -pw aymen1982  aymenabd@tuncxd0046:/local/dhidahr/file-manager/libFileManager.so.1.0.0 C:\git\repo\bin\linux-x86-64\Common
+if ERRORLEVEL 1 exit 1
+del C:\git\repo\bin\linux-x86-64\Common\libFileManager.so.1
+if ERRORLEVEL 1 exit 1
+ren C:\git\repo\bin\linux-x86-64\Common\libFileManager.so.1.0.0 libFileManager.so.1
+if ERRORLEVEL 1 exit 1
+
+:: STMCUBEProgrammer for linuxx 64 
+echo y | pscp -scp -pw aymen1982  aymenabd@tuncxd0046:/local/dhidahr/STM32CubeProgrammer/app/release/STM32_Programmer_CLI C:\git\repo\bin\linux-x86-64\CubeProgrammer
+if ERRORLEVEL 1 exit 1 
+echo y | pscp -scp -pw aymen1982  aymenabd@tuncxd0046:/local/dhidahr/STM32CubeProgrammer/CubeProgrammer_API/libCubeProgrammer_API.so.1.0.0 C:\git\repo\bin\linux-x86-64\CubeProgrammer
+if ERRORLEVEL 1 exit 1
+del C:\git\repo\bin\linux-x86-64\CubeProgrammer\libCubeProgrammer_API.so 
+if ERRORLEVEL 1 exit 1
+ren C:\git\repo\bin\linux-x86-64\CubeProgrammer\libCubeProgrammer_API.so.1.0.0 libCubeProgrammer_API.so 
+if ERRORLEVEL 1 exit 1
+
+
+########################################import resourcees from linux 64 bit ###################################################################
+:: file manager for linux 32
+echo y   | pscp -scp -pw aymen1982  aymenabd@10.157.12.210:/local/dhidahr/file-manager/libFileManager.so.1.0.0 C:\git\repo\bin\linux-x86-32\Common
+if ERRORLEVEL 1 exit 1 
+del C:\git\repo\bin\linux-x86-32\Common\libFileManager.so.1
+if ERRORLEVEL 1 exit 1
+ren C:\git\repo\bin\linux-x86-32\Common\libFileManager.so.1.0.0 libFileManager.so.1
+if ERRORLEVEL 1 exit 1
+
+:: STMCUBEProgrammer for linuxx 32
+
+echo y | pscp -scp -pw aymen1982  aymenabd@10.157.12.210:/local/dhidahr/STM32CubeProgrammer/app/release/STM32_Programmer_CLI C:\git\repo\bin\linux-x86-32\CubeProgrammer
+if ERRORLEVEL 1 exit 1 
+echo y | pscp -scp -pw aymen1982  aymenabd@10.157.12.210:/local/dhidahr/STM32CubeProgrammer/CubeProgrammer_API/libCubeProgrammer_API.so.1.0.0 C:\git\repo\bin\linux-x86-32\CubeProgrammer
+if ERRORLEVEL 1 exit 1
+del C:\git\repo\bin\linux-x86-32\CubeProgrammer\libCubeProgrammer_API.so 
+if ERRORLEVEL 1 exit 1
+ren C:\git\repo\bin\linux-x86-32\CubeProgrammer\libCubeProgrammer_API.so.1.0.0 libCubeProgrammer_API.so 
+if ERRORLEVEL 1 exit 1
