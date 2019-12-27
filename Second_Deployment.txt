@@ -1,0 +1,6 @@
+open codex.cro.st.com
+user
+password
+cd ftp/incoming
+put 
+bye 

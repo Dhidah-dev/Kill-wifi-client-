@@ -1,0 +1,146 @@
+#!/bin/bash
+if [ "$1" = "" ] 
+then
+	export VERSION=`grep "<version>" microxplorer/pom.xml  | head -1 | sed "s/.*<version>//;s/-SNAPSHOT.*//;s/<.*//"`
+else
+	export VERSION=$1
+fi
+if [ "$2" = "" ] 
+then
+	NAME=STM32CubeMX	
+	PRODUCT=STM32CubeMX
+else
+	NAME=$2
+	PRODUCT=Standalone_MCU_Finder
+fi
+OUT=doc/V4/ProjectManagement/ReleaseNotes/$NAME$VERSION.html
+PATH=$PATH:/home/fauvarqd/docs/Projects/python-bugzilla-master/bin
+FORMAT="<tr><td><a href=\"https://intbugzilla.st.com/show_bug.cgi?id=%{bug_id}\">%{bug_id}</a></td><td>%{bug_severity}</td><td>%{assigned_to}</td><td>%{status}</td><td>%{summary}</td></tr>"
+function listbugs() {
+if [ "$1" = "Defect" ]
+then
+	TITLE="Defects"
+elif [ "$1" = "Change_Request" ]
+then
+	TITLE="Change Requests"
+elif [ "$1" = "Work_Package" ]
+then
+	TITLE="Work Packages"
+fi
+cat <<%
+<h3>$TITLE Implemented in $VERSION</h3>
+<table border="1">
+  <tbody>
+      <tr>
+      <th>ID</th>
+      <th>Severity</th>
+      <th>Assignee</th>
+      <th>Status</th>
+      <th>Headline</th>
+    </tr>
+%
+echo "listing $TITLE" >/dev/tty
+bugzilla-cli --bugzilla intbugzilla.st.com query --outputformat="$FORMAT" -p $PRODUCT -s "Implemented" --field cf_bugtype=$1 --field cf_implemented_version=$VERSION
+cat <<%
+  </tbody>
+</table>
+%
+}
+
+function listfirmwares() {
+cat <<%
+<h3>Firmware Packages</h3>
+<p>
+$NAME $VERSION was built using the following firmware packages:
+</p>
+<ul>
+%
+LASTNAME=""
+DB=`echo $VERSION | sed 's/\\(.*\\)\\.\\(.*\\)\\.\\(.*\\)-.*/\\1.0.\\2\\3'/`
+sed "1,/PackDescription Release=\"DB.$DB/d;/DataBase/,\$d;s/.*FW./STM32/;s/\\./ V/;s/\".*//" < $HOMEPATH/.stm32cubemx/plugins/updater/testserver/STMupdaters.xml | while read fwname fwversion
+do
+  if [ "$fwname" != "$LASTNAME" -a -d "mcus/$fwname" ]
+  then
+	LASTNAME=$fwname
+	cat <<%
+<li>$fwname $fwversion</li>
+%
+  fi
+done
+cat <<%
+</ul>
+%
+}
+
+function listdependencies() {
+cat <<%
+<h3>Dependencies:</h3>
+<ul style="font-weight: bold;">
+  <li>Project Generator
+%
+sed "1,/projectgenerator/d;/projectgenerator/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>utilSwing "
+sed "1,/utilSwing/d;/utilSwing/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>util "
+sed "1,/util/d;/util/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>pdscmanager "
+sed "1,/pdscmanager/d;/pdscmanager/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>IPModeConfigManager "
+sed "1,/IPModeConfigManager/d;/IPModeConfigManager/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>cubeanalytics "
+sed "1,/cubeanalytics/d;/cubeanalytics/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "<li>programmerapi "
+sed "1,/programmerapi/d;/programmerapi/d;/dependency/,\$d;s/.*<version>//;s/<.*//" <microxplorer/pom.xml
+echo "</li>"
+
+echo "</ul>"
+
+}
+
+echo "Creating $OUT"
+cat >$OUT <<%
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>$NAME$VERSION</title>
+</head>
+<body>
+<h2 style="text-align: center;">$NAME $VERSION</h2>
+%
+if [ "$2" = "" ]
+then
+echo "listing firmwares and dependencies" 
+listfirmwares >>$OUT
+listdependencies >>$OUT
+fi
+{
+listbugs Defect >>$OUT
+listbugs Change_Request >>$OUT
+listbugs Work_Package >>$OUT
+} 2>&1 | grep -v SecurityWarning
+cat >>$OUT <<%
+</body>
+</html>
+%
+read -p"Commit release notes ? [N]" answer
+if [ "$answer" != "Y" -a "$answer" != "y" ]
+then
+  exit 1
+fi
+git add $OUT
+git commit -m "$NAME $VERSION Release notes"
+exit 0
